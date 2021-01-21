@@ -111,3 +111,20 @@ t1 = find_program( 'testdata/test_s6.sh')
 t2 = find_program( 'testdata/test_s12.sh')
 test('Validation on s6 synthetic graph', t1, args : e, is_parallel : false)
 test('Validation on s12 synthetic graph', t2, args : e, is_parallel : false)
+
+# ========== benchmark
+
+if get_option('enable_benchmark')
+
+  # FIXME The test-matrix file should not be downloaded anew for each build
+  # FIXME The test-matrix file should not be copied into each build directory
+  dat_bench_tgz = configure_file(output : 'coPapersDBLP.tar.gz',
+                                 command : ['wget', 'https://suitesparse-collection-website.herokuapp.com/MM/DIMACS10/coPapersDBLP.tar.gz'])
+  dat_bench = configure_file(output : 'coPapersDBLP.mtx',
+                             input : dat_bench_tgz,
+                             command : ['tar', '-xvzf', dat_bench_tgz, '--strip', '1'],
+                             install : true, install_dir : 'testdata')
+
+  benchmark('suitesparse/coPapersDBLP', e, args : dat_bench)
+
+endif
