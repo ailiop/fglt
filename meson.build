@@ -64,7 +64,14 @@ if get_option('cilktool') == 'cilksan' # ----- Cilksan
       warning('Cilksan instrumentation specified but not building in debug mode!')
     endif
     args_san          = ['-fsanitize=cilk']
-    args_link_san_lib = ['-fsanitize=cilk', '-shared-libasan']
+    args_link_san_lib = ['-fsanitize=cilk']
+    # FIXME There does not seem to be a way to add static-only arguments to
+    # build targets defined via `library()`.
+    # See also: https://github.com/mesonbuild/meson/issues/3304
+    if not get_option('replicate_bug_libasan') \
+       and get_option('default_library') != 'static'
+      args_link_san_lib += ['-shared-libasan']
+    endif
     args_link_san_bin = ['-fsanitize=cilk']
     str_san           = '-cilksan'
   endif
